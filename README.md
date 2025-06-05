@@ -12,8 +12,8 @@ This project is a React-based generic data table built as part of a coding assig
 
 ## Technologies
 - React
-- JavaScript (optionally TypeScript)
-- CSS modules or styled-components
+- TypeScript
+- styled-components
 - Faker.js for mock data generation
 
 ## Running the project
