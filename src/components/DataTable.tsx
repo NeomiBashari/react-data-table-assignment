@@ -1,10 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
-import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import type { TableData } from '../types/table';
-import ProgressBar from './ProgressBar';
 import StatusDropdown from './StatusDropdown';
-import PriorityCell from './PriorityCell';
+import DeleteButton from './DeleteButton';
+import TaskTableRow from './TableRow';
 
 type DataTableProps = {
   data: TableData;
@@ -26,16 +25,19 @@ const DataTable: React.FC<DataTableProps> = ({ data, onDataChange }) => {
 
   const [currentPage, setCurrentPage] = useState(0);
   const tasksPerPage = 10;
+  const totalPages = Math.ceil(data.length / tasksPerPage);
 
   const [editingStatusIndex, setEditingStatusIndex] = useState<number | null>(null);
   const [dropdownPosition, setDropdownPosition] = useState<{ top: number; left: number } | null>(null);
 
+  const [selectedRowIndex, setSelectedRowIndex] = useState<number | null>(null);
+
   const statusColors: { [key: string]: string } = {
-    "Todo": "blue",
-    "In progress": "pink",
-    "On hold": "orange",
-    "Canceled": "red",
-    "Done": "green",
+    "Todo": "#7da6ff",         // darker pastel blue
+    "In progress": "#ff8fb2", // darker pastel pink
+    "On hold": "#ffd580",     // darker pastel orange
+    "Canceled": "#ff7a7a",    // darker pastel red
+    "Done": "#7be87b",        // darker pastel green
   };
 
   const statusCellRefs = useRef<(HTMLDivElement | null)[]>([]);
@@ -57,12 +59,6 @@ const DataTable: React.FC<DataTableProps> = ({ data, onDataChange }) => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, [editingStatusIndex]);
-
-  const handleKeyDown = (event: React.KeyboardEvent) => {
-    if (event.key === 'Enter' && editingStatusIndex !== null) {
-      setEditingStatusIndex(null);
-    }
-  };
 
   const handleNextPage = () => {
     if ((currentPage + 1) * tasksPerPage < data.length) {
@@ -91,12 +87,30 @@ const DataTable: React.FC<DataTableProps> = ({ data, onDataChange }) => {
 
   const handleStatusClick = (rowIndex: number, event: React.MouseEvent) => {
     const actualIndex = currentPage * tasksPerPage + rowIndex;
+    if (editingStatusIndex === actualIndex) {
+      setEditingStatusIndex(null);
+      return;
+    }
     setEditingStatusIndex(actualIndex);
     const rect = (event.target as HTMLElement).getBoundingClientRect();
     setDropdownPosition({
       top: rect.top + window.scrollY - 420,
       left: rect.left + window.scrollX + 80,
     });
+  };
+
+  const handleRowClick = (rowIndex: number) => {
+    setSelectedRowIndex(prevIndex => prevIndex === rowIndex ? null : rowIndex);
+  };
+
+  const handleConfirmDelete = () => {
+    if (selectedRowIndex !== null) {
+      const actualIndex = currentPage * tasksPerPage + selectedRowIndex;
+      const updatedData = [...data];
+      updatedData.splice(actualIndex, 1);
+      onDataChange(updatedData);
+      setSelectedRowIndex(null);
+    }
   };
 
   return (
@@ -109,6 +123,20 @@ const DataTable: React.FC<DataTableProps> = ({ data, onDataChange }) => {
       borderRadius: '8px', 
       padding: '1rem' 
     }}>
+      {/* Delete Button */}
+      <div style={{ 
+        position: 'absolute',
+        top: '-1.9rem',
+        right: '10rem',
+        zIndex: 10
+      }}>
+        <DeleteButton
+          isDisabled={selectedRowIndex === null}
+          onDelete={handleConfirmDelete}
+          isActive={selectedRowIndex !== null}
+        />
+      </div>
+
       <table className="table-auto w-full border-collapse" style={{ 
         borderSpacing: '0 10px',
         backgroundColor: 'white',
@@ -130,217 +158,28 @@ const DataTable: React.FC<DataTableProps> = ({ data, onDataChange }) => {
         </thead>
         <tbody>
           {paginatedData.map((row, rowIndex) => (
-            <tr key={rowIndex} style={{ borderBottom: '1px solid #ddd' }}>
-              {headers.map((header, colIndex) => (
-                header.key === "status" ? (
-                  <td
-                    key={colIndex}
-                    style={{ 
-                      padding: 0,
-                      overflow: 'hidden',                    
-                    }}
-                  >
-                    <div
-                      ref={(el) => { statusCellRefs.current[rowIndex] = el; }}
-                      className="cursor-pointer text-white w-full h-full"
-                      style={{
-                        backgroundColor: statusColors[row[header.key]],
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        padding: '8px 24px', 
-                        fontWeight: '600',
-                        cursor: 'pointer',
-                        transition: 'all 0.2s ease-in-out',
-                        userSelect: 'none'
-                      }}
-                      onClick={(e) => handleStatusClick(rowIndex, e)}
-                      onKeyDown={handleKeyDown}
-                      tabIndex={0}
-                    >
-                      {row[header.key]}
-                    </div>
-                  </td>
-                ) : header.key === "priority" ? (
-                  <td
-                    key={colIndex}
-                    style={{ 
-                      padding: '4px 12px',
-                      position: 'relative'
-                    }}
-                  >
-                    <PriorityCell
-                      value={row[header.key]}
-                      onChange={(value) => handleInputChange(rowIndex, header.key, value)}
-                    />
-                  </td>
-                ) : header.key === "requiresManagerApproval" ? (
-                  <td
-                    key={colIndex}
-                    className="px-4 py-2 text-gray-600 text-center align-middle"
-                    style={{ 
-                      verticalAlign: 'middle', 
-                      textAlign: 'center', 
-                      fontSize: '14px', 
-                      color: '#555',
-                      minHeight: '48px',
-                      padding: '8px 16px'
-                    }}
-                  >
-                    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
-                      <input
-                        type="checkbox"
-                        checked={row[header.key]}
-                        onChange={(e) => handleInputChange(rowIndex, header.key, e.target.checked)}
-                        className="w-5 h-5 cursor-pointer"
-                      />
-                    </div>
-                  </td>
-                ) : header.key === "startDate" || header.key === "dueDate" ? (
-                  <td
-                    key={colIndex}
-                    className="px-4 py-2 text-gray-600 text-center align-middle"
-                    style={{ 
-                      verticalAlign: 'middle', 
-                      textAlign: 'center', 
-                      fontSize: '14px', 
-                      color: '#555',
-                      minHeight: '48px',
-                      padding: '8px 16px'
-                    }}
-                  >
-                    <DatePicker
-                      selected={row[header.key] ? new Date(row[header.key]) : null}
-                      onChange={(date: Date | null) => {
-                        if (date) {
-                          handleInputChange(rowIndex, header.key, date.toISOString().split('T')[0]);
-                        }
-                      }}
-                      className="w-full rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      placeholderText="Select date"
-                      isClearable={false}
-                    />
-                  </td>
-                ) : header.key === "timeline" ? (
-                  <td
-                    key={colIndex}
-                    className="px-4 py-2 text-gray-600 text-center align-middle"
-                    style={{ 
-                      verticalAlign: 'middle', 
-                      textAlign: 'center', 
-                      fontSize: '14px', 
-                      color: '#555',
-                      minHeight: '48px',
-                      padding: '8px 16px'
-                    }}
-                  >
-                    <ProgressBar
-                      startDate={row.startDate}
-                      dueDate={row.dueDate}
-                      status={row.status}
-                    />
-                  </td>
-                ) : header.key === "floorCount" ? (
-                  <td
-                    key={colIndex}
-                    className="px-4 py-2 text-gray-600 text-center align-middle"
-                    style={{ 
-                      verticalAlign: 'middle', 
-                      textAlign: 'center', 
-                      fontSize: '14px', 
-                      color: '#555',
-                      minHeight: '48px',
-                      padding: '8px 16px'
-                    }}
-                  >
-                    <select
-                      value={row[header.key]}
-                      onChange={(e) => handleInputChange(rowIndex, header.key, e.target.value)}
-                      style={{ 
-                        backgroundColor: 'inherit', 
-                        color: '#94A3B8',
-                        border: 'none', 
-                        textAlign: 'center', 
-                        width: '100%',
-                        appearance: 'none',
-                        WebkitAppearance: 'none',
-                        MozAppearance: 'none',
-                        cursor: 'pointer'
-                      }}
-                    >
-                      <option value="">Select floor count</option>
-                      <option value="1–20">1–20</option>
-                      <option value="21–40">21–40</option>
-                      <option value="41+">41+</option>
-                    </select>
-                  </td>
-                ) : header.key === "taskType" ? (
-                  <td
-                    key={colIndex}
-                    className="px-4 py-2 text-gray-600 text-center align-middle"
-                    style={{ 
-                      verticalAlign: 'middle', 
-                      textAlign: 'center', 
-                      fontSize: '14px', 
-                      color: '#555',
-                      minHeight: '48px',
-                      padding: '8px 16px'
-                    }}
-                  >
-                    <select
-                      value={row[header.key]}
-                      onChange={(e) => handleInputChange(rowIndex, header.key, e.target.value)}
-                      style={{ 
-                        backgroundColor: 'inherit', 
-                        color: '#94A3B8',
-                        border: 'none', 
-                        textAlign: 'center', 
-                        width: '100%',
-                        appearance: 'none',
-                        WebkitAppearance: 'none',
-                        MozAppearance: 'none',
-                        cursor: 'pointer'
-                      }}
-                    >
-                      <option value="">Select task type</option>
-                      <option value="Execution">Execution</option>
-                      <option value="Inspection">Inspection</option>
-                      <option value="Planning">Planning</option>
-                      <option value="Maintenance">Maintenance</option>
-                    </select>
-                  </td>
-                ) : (
-                  <td
-                    key={colIndex}
-                    className="px-4 py-2 text-gray-600 text-center align-middle"
-                    style={{ 
-                      verticalAlign: 'middle', 
-                      textAlign: 'center', 
-                      fontSize: '14px', 
-                      color: '#555',
-                      minHeight: '48px',
-                      padding: '8px 16px'
-                    }}
-                  >
-                    <input
-                      type="text"
-                      value={row[header.key]}
-                      onChange={(e) => handleInputChange(rowIndex, header.key, e.target.value)}
-                      className="w-full rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      style={{ backgroundColor: 'inherit', color: 'black', border: 'none', textAlign: 'center' }}
-                    />
-                  </td>
-                )
-              ))}
-            </tr>
+            <TaskTableRow
+              key={rowIndex}
+              row={row}
+              rowIndex={rowIndex}
+              headers={headers}
+              isSelected={rowIndex === selectedRowIndex}
+              statusColors={statusColors}
+              onSelect={() => handleRowClick(rowIndex)}
+              onStatusClick={handleStatusClick}
+              onInputChange={handleInputChange}
+              statusCellRef={(el) => { statusCellRefs.current[rowIndex] = el; }}
+            />
           ))}
-                  </tbody>
+        </tbody>
       </table>
+
       {editingStatusIndex !== null && dropdownPosition && (
         <StatusDropdown
           statusColors={statusColors}
           onSelect={(status: string) => {
-            handleInputChange(editingStatusIndex, "status", status);
+            const pageRowIndex = editingStatusIndex - currentPage * tasksPerPage;
+            handleInputChange(pageRowIndex, "status", status);
             setEditingStatusIndex(null);
           }}
           style={{
@@ -350,6 +189,17 @@ const DataTable: React.FC<DataTableProps> = ({ data, onDataChange }) => {
           }}
         />
       )}
+      <div style={{
+        color: '#888',
+        textAlign: 'center',
+        fontSize: '14px',
+        marginTop: '0.5rem',
+        position: 'relative',
+        left: '52%',
+        transform: 'translateX(-50%)',
+      }}>
+        page {currentPage + 1} of {totalPages}
+      </div>
       <div className="flex justify-center mt-4" style={{ position: 'relative', left: '50%', bottom: '0', marginTop: '0.5rem'}}>
         <button
           onClick={handlePreviousPage}

@@ -19,7 +19,7 @@ const StatusDropdown: React.FC<StatusDropdownProps> = ({ statusColors, onSelect,
         padding: '8px',
         boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)',
         border: '1px solid rgba(0, 0, 0, 0.1)',
-        width: '180px',
+        width: '130px',
         animation: 'fadeIn 0.2s ease-in-out',
       }}
     >
@@ -28,7 +28,7 @@ const StatusDropdown: React.FC<StatusDropdownProps> = ({ statusColors, onSelect,
           key={status}
           onClick={() => onSelect(status)}
           style={{
-            padding: '10px 16px',
+            padding: '5px 10px',
             margin: '4px 0',
             cursor: 'pointer',
             borderRadius: '8px',
