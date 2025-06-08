@@ -1,7 +1,7 @@
 html, body, #root {
   height: 100%;
   margin: 0;
-  background-color: #ffcc99;
+  background-color: #fff5cc;
   color: black;
 }
 
@@ -51,5 +51,6 @@ html, body, #root {
 .app-container {
   padding: 1.5rem;
   min-height: 100%;
+  background-color: transparent;
 }
 

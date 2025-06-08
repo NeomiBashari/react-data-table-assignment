@@ -15,9 +15,9 @@ const DataTable: React.FC<DataTableProps> = ({ data, onDataChange }) => {
     { key: "owner", label: "Owner" },
     { key: "floorCount", label: "Floor Count" },
     { key: "timeline", label: "Timeline" },
-    { key: "status", label: "Status" },
     { key: "startDate", label: "Start Date" },
     { key: "dueDate", label: "Due Date" },
+    { key: "status", label: "Status" },
     { key: "requiresManagerApproval", label: "Requires Manager Approval?" },
     { key: "taskType", label: "Task Type" },
     { key: "priority", label: "Priority" },
@@ -99,9 +99,22 @@ const DataTable: React.FC<DataTableProps> = ({ data, onDataChange }) => {
   };
 
   return (
-    <div className="overflow-x-auto rounded-lg shadow-md relative" style={{ marginLeft: '1rem', position: 'relative', top: '15rem', minHeight: 'calc(100vh - 300px)', backgroundColor: '#f6f6f6', borderRadius: '8px', padding: '1rem' }}>
-      <table className="table-auto w-full border-collapse" style={{ borderSpacing: '0 10px' }}>
-        <thead className="bg-gray-200" style={{ backgroundColor: '#f0f0f0', borderRadius: '8px' }}>
+    <div className="overflow-x-auto rounded-lg shadow-md relative" style={{ 
+      marginLeft: '1rem', 
+      position: 'relative', 
+      top: '15rem', 
+      minHeight: 'calc(100vh - 300px)', 
+      backgroundColor: 'transparent', 
+      borderRadius: '8px', 
+      padding: '1rem' 
+    }}>
+      <table className="table-auto w-full border-collapse" style={{ 
+        borderSpacing: '0 10px',
+        backgroundColor: 'white',
+        borderRadius: '8px',
+        overflow: 'hidden'
+      }}>
+        <thead className="bg-gray-200" style={{ backgroundColor: 'rgba(240, 240, 240, 0.5)', borderRadius: '8px' }}>
           <tr>
             {headers.map((header, index) => (
               <th
@@ -116,12 +129,17 @@ const DataTable: React.FC<DataTableProps> = ({ data, onDataChange }) => {
         </thead>
         <tbody>
           {paginatedData.map((row, rowIndex) => (
-            <tr key={rowIndex} style={{ backgroundColor: '#fff', borderRadius: '8px', marginBottom: '10px', boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)' }}>
+            <tr key={rowIndex} style={{ borderBottom: '1px solid #ddd' }}>
               {headers.map((header, colIndex) => (
                 <td
                   key={colIndex}
                   className="px-4 py-2 text-gray-600 text-center align-middle"
-                  style={{ verticalAlign: 'middle', textAlign: 'center', padding: '10px', fontSize: '14px', color: '#555', borderBottom: '1px solid #ddd' }}
+                  style={{ 
+                    verticalAlign: 'middle', 
+                    textAlign: 'center', 
+                    fontSize: '14px', 
+                    color: '#555', 
+                  }}
                 >
                   {header.key === "requiresManagerApproval" ? (
                     <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>

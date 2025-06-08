@@ -19,32 +19,57 @@ const ProgressBar: React.FC<ProgressBarProps> = ({ startDate, dueDate, status })
   const percentage = calculateTimelinePercentage(startDate, dueDate);
 
   const getBarColor = (): string => {
-    if (status === 'done') {
-      return 'green';
+    if (status === 'Done') {
+      return '#22c55e'; // Green
     }
     if (percentage <= 50) {
-      return 'green';
+      return '#3b82f6'; // Blue
     } else if (percentage > 50 && percentage <= 80) {
-      return 'orange';
+      return '#f97316'; // Orange
     } else {
-      return 'red';
+      return '#ef4444'; // Red
     }
   };
 
   return (
     <div
-      className="w-full bg-gray-300 rounded-full h-6 shadow-md"
-      style={{ position: 'relative', overflow: 'hidden', minWidth: '150px'}} 
+      style={{ 
+        position: 'relative',
+        minWidth: '70px',
+        height: '13px',
+        backgroundColor: '#e5e7eb',
+        borderRadius: '5px',
+        overflow: 'hidden'
+      }}
     >
       <div
-        className="h-6 rounded-full"
         style={{
           width: `${percentage}%`,
           backgroundColor: getBarColor(),
-          transition: 'width 0.3s ease-in-out',
-          boxShadow: '0px 4px 6px rgba(0, 0, 0, 0.1)',
+          height: '100%',
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          transition: 'width 0.5s ease-in-out',
+          borderRadius: '4px'
         }}
-      ></div>
+      />
+      <div
+        style={{
+          position: 'absolute',
+          width: '100%',
+          height: '100%',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          color: '#000000',
+          fontSize: '11px',
+          fontWeight: '500',
+          zIndex: 1
+        }}
+      >
+        {Math.round(percentage)}%
+      </div>
     </div>
   );
 };
