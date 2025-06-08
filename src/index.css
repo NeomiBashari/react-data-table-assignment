@@ -60,6 +60,7 @@ button:focus-visible {
 }
 
 table {
+  background-color: white; /* Set table background to white */
   color: black;
   border: 1px solid #d1d5db;
   border-collapse: collapse;

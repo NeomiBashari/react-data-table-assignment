@@ -1,9 +1,7 @@
 export interface TableRow {
-  responsibleName: string;
-  taskDescription: string;
-  projectName: string;
+  owner: string;
   floorCount: '1–20' | '21–40' | '41+';
-  status: 'todo' | 'in progress' | 'on hold' | 'canceled' | 'done';
+  status: 'Todo' | 'In progress' | 'On hold' | 'Canceled' | 'Done';
   startDate: string; 
   dueDate: string; 
   requiresManagerApproval: boolean;

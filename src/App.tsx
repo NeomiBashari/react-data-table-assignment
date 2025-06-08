@@ -18,7 +18,7 @@ const App = () => {
 
   return (
     <div className="app-container">
-      <div style={{ width: '100%', textAlign: 'left', height: '3.5rem', display: 'flex', alignItems: 'center', justifyContent: 'flex-start', paddingLeft: '1rem', marginBottom: '1rem' }}>
+      <div style={{ width: '100%', textAlign: 'left', height: '3.5rem', display: 'flex', alignItems: 'center', justifyContent: 'flex-start', paddingLeft: '1rem', position: 'relative', top: '12rem' }}>
         {isEditing ? (
           <input
             type="text"
