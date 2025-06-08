@@ -7,6 +7,35 @@ type ProgressBarProps = {
 };
 
 const ProgressBar: React.FC<ProgressBarProps> = ({ startDate, dueDate, status }) => {
+  // אם אין תאריכים, נציג פס ריק
+  if (!startDate || !dueDate) {
+    return (
+      <div
+        style={{ 
+          position: 'relative',
+          minWidth: '70px',
+          height: '13px',
+          backgroundColor: '#e5e7eb',
+          borderRadius: '5px',
+          overflow: 'hidden',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center'
+        }}
+      >
+        <div
+          style={{
+            color: '#6b7280',
+            fontSize: '11px',
+            fontWeight: '500'
+          }}
+        >
+          Set dates
+        </div>
+      </div>
+    );
+  }
+
   const calculateTimelinePercentage = (startDate: string, dueDate: string): number => {
     const start = new Date(startDate).getTime();
     const due = new Date(dueDate).getTime();

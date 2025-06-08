@@ -4,6 +4,7 @@ import 'react-datepicker/dist/react-datepicker.css';
 import type { TableData } from '../types/table';
 import ProgressBar from './ProgressBar';
 import StatusDropdown from './StatusDropdown';
+import PriorityCell from './PriorityCell';
 
 type DataTableProps = {
   data: TableData;
@@ -131,17 +132,61 @@ const DataTable: React.FC<DataTableProps> = ({ data, onDataChange }) => {
           {paginatedData.map((row, rowIndex) => (
             <tr key={rowIndex} style={{ borderBottom: '1px solid #ddd' }}>
               {headers.map((header, colIndex) => (
-                <td
-                  key={colIndex}
-                  className="px-4 py-2 text-gray-600 text-center align-middle"
-                  style={{ 
-                    verticalAlign: 'middle', 
-                    textAlign: 'center', 
-                    fontSize: '14px', 
-                    color: '#555', 
-                  }}
-                >
-                  {header.key === "requiresManagerApproval" ? (
+                header.key === "status" ? (
+                  <td
+                    key={colIndex}
+                    style={{ 
+                      padding: 0,
+                      overflow: 'hidden',                    
+                    }}
+                  >
+                    <div
+                      ref={(el) => { statusCellRefs.current[rowIndex] = el; }}
+                      className="cursor-pointer text-white w-full h-full"
+                      style={{
+                        backgroundColor: statusColors[row[header.key]],
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        padding: '8px 24px', 
+                        fontWeight: '600',
+                        cursor: 'pointer',
+                        transition: 'all 0.2s ease-in-out',
+                        userSelect: 'none'
+                      }}
+                      onClick={(e) => handleStatusClick(rowIndex, e)}
+                      onKeyDown={handleKeyDown}
+                      tabIndex={0}
+                    >
+                      {row[header.key]}
+                    </div>
+                  </td>
+                ) : header.key === "priority" ? (
+                  <td
+                    key={colIndex}
+                    style={{ 
+                      padding: '4px 12px',
+                      position: 'relative'
+                    }}
+                  >
+                    <PriorityCell
+                      value={row[header.key]}
+                      onChange={(value) => handleInputChange(rowIndex, header.key, value)}
+                    />
+                  </td>
+                ) : header.key === "requiresManagerApproval" ? (
+                  <td
+                    key={colIndex}
+                    className="px-4 py-2 text-gray-600 text-center align-middle"
+                    style={{ 
+                      verticalAlign: 'middle', 
+                      textAlign: 'center', 
+                      fontSize: '14px', 
+                      color: '#555',
+                      minHeight: '48px',
+                      padding: '8px 16px'
+                    }}
+                  >
                     <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
                       <input
                         type="checkbox"
@@ -150,52 +195,133 @@ const DataTable: React.FC<DataTableProps> = ({ data, onDataChange }) => {
                         className="w-5 h-5 cursor-pointer"
                       />
                     </div>
-                  ) : header.key === "startDate" || header.key === "dueDate" ? (
+                  </td>
+                ) : header.key === "startDate" || header.key === "dueDate" ? (
+                  <td
+                    key={colIndex}
+                    className="px-4 py-2 text-gray-600 text-center align-middle"
+                    style={{ 
+                      verticalAlign: 'middle', 
+                      textAlign: 'center', 
+                      fontSize: '14px', 
+                      color: '#555',
+                      minHeight: '48px',
+                      padding: '8px 16px'
+                    }}
+                  >
                     <DatePicker
-                      selected={new Date(row[header.key])}
-                      onChange={(date) => handleInputChange(rowIndex, header.key, date)}
-                      className="w-full rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    />
-                  ) : header.key === "status" ? (
-                    <div
-                      ref={(el) => { statusCellRefs.current[rowIndex] = el; }}
-                      className="cursor-pointer px-2 py-1 rounded text-white"
-                      style={{
-                        backgroundColor: statusColors[row[header.key]],
-                        width: '100%',
-                        height: '100%',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        position: 'relative',
-                        borderRadius: '4px',
-                        boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
-                        fontWeight: 'bold',
-                        cursor: 'pointer',
+                      selected={row[header.key] ? new Date(row[header.key]) : null}
+                      onChange={(date: Date | null) => {
+                        if (date) {
+                          handleInputChange(rowIndex, header.key, date.toISOString().split('T')[0]);
+                        }
                       }}
-                      onClick={(e) => handleStatusClick(rowIndex, e)}
-                      onKeyDown={handleKeyDown}
-                      tabIndex={0}
-                    >
-                      {row[header.key]}
-                    </div>
-                  ) : header.key === "priority" ? (
-                    <select
-                      value={row[header.key]}
-                      onChange={(e) => handleInputChange(rowIndex, header.key, e.target.value)}
-                      className="w-full rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-inherit border border-gray-300 text-gray-700"
-                    >
-                      <option value="Low">Low</option>
-                      <option value="Medium">Medium</option>
-                      <option value="High">High</option>
-                    </select>
-                  ) : header.key === "timeline" ? (
+                      className="w-full rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholderText="Select date"
+                      isClearable={false}
+                    />
+                  </td>
+                ) : header.key === "timeline" ? (
+                  <td
+                    key={colIndex}
+                    className="px-4 py-2 text-gray-600 text-center align-middle"
+                    style={{ 
+                      verticalAlign: 'middle', 
+                      textAlign: 'center', 
+                      fontSize: '14px', 
+                      color: '#555',
+                      minHeight: '48px',
+                      padding: '8px 16px'
+                    }}
+                  >
                     <ProgressBar
                       startDate={row.startDate}
                       dueDate={row.dueDate}
                       status={row.status}
                     />
-                  ) : (
+                  </td>
+                ) : header.key === "floorCount" ? (
+                  <td
+                    key={colIndex}
+                    className="px-4 py-2 text-gray-600 text-center align-middle"
+                    style={{ 
+                      verticalAlign: 'middle', 
+                      textAlign: 'center', 
+                      fontSize: '14px', 
+                      color: '#555',
+                      minHeight: '48px',
+                      padding: '8px 16px'
+                    }}
+                  >
+                    <select
+                      value={row[header.key]}
+                      onChange={(e) => handleInputChange(rowIndex, header.key, e.target.value)}
+                      style={{ 
+                        backgroundColor: 'inherit', 
+                        color: '#94A3B8',
+                        border: 'none', 
+                        textAlign: 'center', 
+                        width: '100%',
+                        appearance: 'none',
+                        WebkitAppearance: 'none',
+                        MozAppearance: 'none',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      <option value="">Select floor count</option>
+                      <option value="1–20">1–20</option>
+                      <option value="21–40">21–40</option>
+                      <option value="41+">41+</option>
+                    </select>
+                  </td>
+                ) : header.key === "taskType" ? (
+                  <td
+                    key={colIndex}
+                    className="px-4 py-2 text-gray-600 text-center align-middle"
+                    style={{ 
+                      verticalAlign: 'middle', 
+                      textAlign: 'center', 
+                      fontSize: '14px', 
+                      color: '#555',
+                      minHeight: '48px',
+                      padding: '8px 16px'
+                    }}
+                  >
+                    <select
+                      value={row[header.key]}
+                      onChange={(e) => handleInputChange(rowIndex, header.key, e.target.value)}
+                      style={{ 
+                        backgroundColor: 'inherit', 
+                        color: '#94A3B8',
+                        border: 'none', 
+                        textAlign: 'center', 
+                        width: '100%',
+                        appearance: 'none',
+                        WebkitAppearance: 'none',
+                        MozAppearance: 'none',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      <option value="">Select task type</option>
+                      <option value="Execution">Execution</option>
+                      <option value="Inspection">Inspection</option>
+                      <option value="Planning">Planning</option>
+                      <option value="Maintenance">Maintenance</option>
+                    </select>
+                  </td>
+                ) : (
+                  <td
+                    key={colIndex}
+                    className="px-4 py-2 text-gray-600 text-center align-middle"
+                    style={{ 
+                      verticalAlign: 'middle', 
+                      textAlign: 'center', 
+                      fontSize: '14px', 
+                      color: '#555',
+                      minHeight: '48px',
+                      padding: '8px 16px'
+                    }}
+                  >
                     <input
                       type="text"
                       value={row[header.key]}
@@ -203,12 +329,12 @@ const DataTable: React.FC<DataTableProps> = ({ data, onDataChange }) => {
                       className="w-full rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
                       style={{ backgroundColor: 'inherit', color: 'black', border: 'none', textAlign: 'center' }}
                     />
-                  )}
-                </td>
+                  </td>
+                )
               ))}
             </tr>
           ))}
-        </tbody>
+                  </tbody>
       </table>
       {editingStatusIndex !== null && dropdownPosition && (
         <StatusDropdown
