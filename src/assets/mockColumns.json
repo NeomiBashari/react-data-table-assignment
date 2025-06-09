@@ -1,0 +1,11 @@
+[
+  { "id": "owner", "ordinalNo": 0, "title": "Owner", "type": "string" },
+  { "id": "floorCount", "ordinalNo": 1, "title": "Floor Count", "type": "string" },
+  { "id": "timeline", "ordinalNo": 2, "title": "Timeline", "type": "progress" },
+  { "id": "startDate", "ordinalNo": 3, "title": "Start Date", "type": "date" },
+  { "id": "dueDate", "ordinalNo": 4, "title": "Due Date", "type": "date" },
+  { "id": "status", "ordinalNo": 5, "title": "Status", "type": "status" },
+  { "id": "requiresManagerApproval", "ordinalNo": 6, "title": "Requires Manager Approval?", "type": "boolean" },
+  { "id": "taskType", "ordinalNo": 7, "title": "Task Type", "type": "string" },
+  { "id": "priority", "ordinalNo": 8, "title": "Priority", "type": "string" }
+]

@@ -1,11 +1,10 @@
 import React from 'react';
 import DatePicker from 'react-datepicker';
 import ProgressBar from '../progressBar/ProgressBar';
-import type { TableRow as TableRowType } from '../../types/table.types';
 import './TableRow.scss';
 
 interface TaskTableRowProps {
-  row: TableRowType;
+  row: { [columnId: string]: any; id: string };
   rowIndex: number;
   headers: { key: string; label: string }[];
   isSelected: boolean;

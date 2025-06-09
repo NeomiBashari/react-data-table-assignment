@@ -14,21 +14,14 @@ type DataTableProps = {
 };
 
 const DataTable: React.FC<DataTableProps> = ({ data, onDataChange }) => {
-  const headers = [
-    { key: "owner", label: "Owner" },
-    { key: "floorCount", label: "Floor Count" },
-    { key: "timeline", label: "Timeline" },
-    { key: "startDate", label: "Start Date" },
-    { key: "dueDate", label: "Due Date" },
-    { key: "status", label: "Status" },
-    { key: "requiresManagerApproval", label: "Requires Manager Approval?" },
-    { key: "taskType", label: "Task Type" },
-    { key: "priority", label: "Priority" },
-  ];
+  const headers = data.columns
+    .slice()
+    .sort((a, b) => a.ordinalNo - b.ordinalNo)
+    .map((col) => ({ key: col.id, label: col.title }));
 
   const [currentPage, setCurrentPage] = useState(0);
   const tasksPerPage = 10;
-  const totalPages = Math.ceil(data.length / tasksPerPage);
+  const totalPages = Math.ceil(data.data.length / tasksPerPage);
 
   const [editingStatusIndex, setEditingStatusIndex] = useState<number | null>(null);
   const [dropdownPosition, setDropdownPosition] = useState<{ top: number; left: number } | null>(null);
@@ -50,7 +43,7 @@ const DataTable: React.FC<DataTableProps> = ({ data, onDataChange }) => {
   const statusCellRefs = useRef<(HTMLDivElement | null)[]>([]);
 
   const handleNextPage = () => {
-    if ((currentPage + 1) * tasksPerPage < data.length) {
+    if ((currentPage + 1) * tasksPerPage < data.data.length) {
       setCurrentPage(currentPage + 1);
     }
   };
@@ -61,7 +54,7 @@ const DataTable: React.FC<DataTableProps> = ({ data, onDataChange }) => {
     }
   };
 
-  const paginatedData = data.slice(
+  const paginatedData = data.data.slice(
     currentPage * tasksPerPage,
     (currentPage + 1) * tasksPerPage
   );
@@ -92,14 +85,12 @@ const DataTable: React.FC<DataTableProps> = ({ data, onDataChange }) => {
   }, [paginatedData, sortConfig]);
 
   const handleInputChange = (rowIndex: number, key: string, value: any) => {
-
-
     console.log(`Updating row ${rowIndex}, key: ${key}, value: ${value}`);
     const actualIndex = typeof rowIndex === 'number' ? 
       (currentPage * tasksPerPage + rowIndex) : rowIndex;
-    const updatedData = [...data];
-    updatedData[actualIndex][key] = value;
-    onDataChange(updatedData);
+    const updatedRows = [...data.data];
+    updatedRows[actualIndex][key] = value;
+    onDataChange({ ...data, data: updatedRows });
   };
 
   const handleStatusClick = (rowIndex: number, event: React.MouseEvent) => {
@@ -123,9 +114,9 @@ const DataTable: React.FC<DataTableProps> = ({ data, onDataChange }) => {
   const handleConfirmDelete = () => {
     if (selectedRowIndex !== null) {
       const actualIndex = currentPage * tasksPerPage + selectedRowIndex;
-      const updatedData = [...data];
-      updatedData.splice(actualIndex, 1);
-      onDataChange(updatedData);
+      const updatedRows = [...data.data];
+      updatedRows.splice(actualIndex, 1);
+      onDataChange({ ...data, data: updatedRows });
       setSelectedRowIndex(null);
     }
   };
@@ -187,7 +178,7 @@ const DataTable: React.FC<DataTableProps> = ({ data, onDataChange }) => {
         <tbody>
           {sortedData.map((row, rowIndex) => (
             <TaskTableRow
-              key={rowIndex}
+              key={row.id || rowIndex}
               row={row}
               rowIndex={rowIndex}
               headers={headers.filter((header) => visibleColumns.has(header.key))}
@@ -229,7 +220,7 @@ const DataTable: React.FC<DataTableProps> = ({ data, onDataChange }) => {
         </button>
         <button
           onClick={handleNextPage}
-          disabled={(currentPage + 1) * tasksPerPage >= data.length}
+          disabled={(currentPage + 1) * tasksPerPage >= data.data.length}
           className="datatable-pagination-btn px-2 py-1 border rounded shadow-md bg-white"
         >
           &gt;

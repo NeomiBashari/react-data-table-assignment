@@ -1,13 +1,19 @@
 import { useState } from 'react';
 import mockData from './assets/mockData.json';
-import type { TableData, TableRow } from './types/table.types';
+import mockColumns from './assets/mockColumns.json';
+import type { TableData } from './types/table.types';
 import DataTable from './components/dataTable/DataTable';
 import AddTaskButton from './components/addTaskButton/AddTaskButton';
 import './App.scss';
 import backgroundIcon from './assets/background-icon.png';
 
+const initialTableData: TableData = {
+  columns: mockColumns,
+  data: (mockData as any[]).map((row, idx) => ({ id: idx.toString(), ...row })),
+};
+
 const App = () => {
-  const [tableData, setTableData] = useState<TableData>(mockData as TableData);
+  const [tableData, setTableData] = useState<TableData>(initialTableData);
   const [title, setTitle] = useState('Project Task Manager');
   const [isEditing, setIsEditing] = useState(false);
 
@@ -19,8 +25,14 @@ const App = () => {
     setIsEditing(false);
   };
 
-  const handleAddTask = (newTask: TableRow) => {
-    setTableData([newTask, ...tableData]);
+  const handleAddTask = (newTask: any) => {
+    setTableData({
+      ...tableData,
+      data: [
+        { id: Date.now().toString(), ...newTask },
+        ...tableData.data,
+      ],
+    });
   };
 
   return (

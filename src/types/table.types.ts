@@ -1,13 +1,15 @@
-export interface TableRow {
-  owner: string;
-  floorCount: '' | '1–20' | '21–40' | '41+';
-  status: 'Todo' | 'In progress' | 'On hold' | 'Canceled' | 'Done';
-  startDate: string; 
-  dueDate: string; 
-  requiresManagerApproval: boolean;
-  taskType: '' | 'Execution' | 'Inspection' | 'Planning' | 'Maintenance';
-  priority: '' | 'Low' | 'Medium' | 'High';
-  [key: string]: any;
+export interface TableColumn {
+  id: string; // id of the column, matches data rows
+  ordinalNo: number; // position of the column
+  title: string; // name of the column
+  type: string; // type of the data in the column
+  width?: number; // optional width
 }
 
-export type TableData = TableRow[];
+export interface TableData {
+  columns: TableColumn[];
+  data: Array<{
+    id: string;
+    [columnId: string]: any;
+  }>;
+}
