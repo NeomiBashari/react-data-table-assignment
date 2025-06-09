@@ -1,11 +1,13 @@
 import { useState } from 'react';
-import { generateFakeTableData } from './utils/generateFakeTableData';
-import type { TableData, TableRow } from './types/table';
-import DataTable from './components/DataTable';
-import AddTaskButton from './components/AddTaskButton';
+import mockData from './assets/mockData.json';
+import type { TableData, TableRow } from './types/table.types';
+import DataTable from './components/dataTable/DataTable';
+import AddTaskButton from './components/addTaskButton/AddTaskButton';
+import './App.scss';
+import backgroundIcon from './assets/background-icon.png';
 
 const App = () => {
-  const [tableData, setTableData] = useState<TableData>(generateFakeTableData());
+  const [tableData, setTableData] = useState<TableData>(mockData as TableData);
   const [title, setTitle] = useState('Project Task Manager');
   const [isEditing, setIsEditing] = useState(false);
 
@@ -22,50 +24,33 @@ const App = () => {
   };
 
   return (
-    <div className="app-container" style={{ position: 'relative' }}>
-      {/* Title Container*/}
-      <div style={{ 
-        position: 'absolute',
-        marginTop: '7rem',
-        left: '2rem',
-        zIndex: 10
-      }}>
+    <div className="app-container">
+      <img src={backgroundIcon} alt="Logo" className="top-right-image" />
+      <div className="title-container">
         {isEditing ? (
           <input
             type="text"
             value={title}
             onChange={handleTitleChange}
             onBlur={handleTitleBlur}
-            className="text-3xl font-bold border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            style={{ fontSize: '2.8rem', fontWeight: '700', width: 'auto', textAlign: 'left', backgroundColor: 'inherit', color: 'inherit', height: '3.5rem', lineHeight: '3.5rem' }}
+            className="title-input"
             autoFocus
           />
         ) : (
           <h1
-            className="text-3xl font-bold cursor-pointer"
-            style={{ fontSize: '2.8rem', fontWeight: '700', height: '3.5rem', lineHeight: '3.5rem' }}
+            className="title-heading"
             onClick={() => setIsEditing(true)}
           >
             {title}
           </h1>
         )}
       </div>
-      
-      {/* Add Task Button Container */}
-      <div style={{
-        position: 'absolute',
-        top: '13rem',
-        right: '1rem',
-        zIndex: 10
-      }}>
+
+      <div className="add-task-container">
         <AddTaskButton onAddTask={handleAddTask} />
       </div>
 
-      {/* Table Container */}
-      <div style={{
-        marginTop: '2rem',
-        width: '100%'
-      }}>
+      <div>
         <DataTable data={tableData} onDataChange={setTableData} />
       </div>
     </div>

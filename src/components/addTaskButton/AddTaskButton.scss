@@ -1,0 +1,32 @@
+.add-task-button {
+  position: absolute;
+  top: 12.3rem;
+  left: -8rem;
+  background-color: #177fee;
+  color: white;
+  padding: 6px 20px;
+  border-radius: 4px;
+  border: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 6px rgba(0, 115, 234, 0.2);
+  height: 35px;
+  width: 120px;
+  justify-content: center;
+  white-space: nowrap;
+}
+.add-task-button:hover {
+  background-color: #0065d1;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 115, 234, 0.3);
+}
+.add-task-button:not(:hover) {
+  background-color: #0073ea;
+  transform: translateY(0);
+  box-shadow: 0 2px 6px rgba(0, 115, 234, 0.2);
+}

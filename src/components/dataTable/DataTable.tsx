@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
 import 'react-datepicker/dist/react-datepicker.css';
-import type { TableData } from '../types/table';
-import StatusDropdown from './StatusDropdown';
-import DeleteButton from './DeleteButton';
-import TaskTableRow from './TableRow';
+import './DataTable.scss';
+import type { TableData } from '../../types/table.types';
+import StatusDropdown from '../statusDropdown/StatusDropdown';
+import DeleteButton from '../deleteButton/DeleteButton';
+import TaskTableRow from '../tableRow/TableRow';
 
 type DataTableProps = {
   data: TableData;
@@ -114,42 +115,22 @@ const DataTable: React.FC<DataTableProps> = ({ data, onDataChange }) => {
   };
 
   return (
-    <div className="overflow-x-auto rounded-lg shadow-md relative" style={{ 
-      marginLeft: '1rem', 
-      position: 'relative', 
-      top: '15rem', 
-      minHeight: 'calc(100vh - 300px)', 
-      backgroundColor: 'transparent', 
-      borderRadius: '8px', 
-      padding: '1rem' 
-    }}>
+    <div className="datatable-container overflow-x-auto rounded-lg shadow-md relative">
       {/* Delete Button */}
-      <div style={{ 
-        position: 'absolute',
-        top: '-1.9rem',
-        right: '10rem',
-        zIndex: 10
-      }}>
+      <div className="datatable-delete-button">
         <DeleteButton
           isDisabled={selectedRowIndex === null}
           onDelete={handleConfirmDelete}
           isActive={selectedRowIndex !== null}
         />
       </div>
-
-      <table className="table-auto w-full border-collapse" style={{ 
-        borderSpacing: '0 10px',
-        backgroundColor: 'white',
-        borderRadius: '8px',
-        overflow: 'hidden'
-      }}>
-        <thead className="bg-gray-200" style={{ backgroundColor: 'rgba(240, 240, 240, 0.5)', borderRadius: '8px' }}>
+      <table className="datatable-table table-auto w-full border-collapse">
+        <thead className="datatable-thead bg-gray-200">
           <tr>
             {headers.map((header, index) => (
               <th
                 key={index}
-                className="px-4 py-2 text-left font-semibold text-gray-700"
-                style={{ padding: '10px', fontSize: '14px', color: '#333', borderBottom: '1px solid #ddd' }}
+                className="datatable-th px-4 py-2 text-left font-semibold text-gray-700"
               >
                 {header.label}
               </th>
@@ -173,7 +154,6 @@ const DataTable: React.FC<DataTableProps> = ({ data, onDataChange }) => {
           ))}
         </tbody>
       </table>
-
       {editingStatusIndex !== null && dropdownPosition && (
         <StatusDropdown
           statusColors={statusColors}
@@ -189,31 +169,21 @@ const DataTable: React.FC<DataTableProps> = ({ data, onDataChange }) => {
           }}
         />
       )}
-      <div style={{
-        color: '#888',
-        textAlign: 'center',
-        fontSize: '14px',
-        marginTop: '0.5rem',
-        position: 'relative',
-        left: '52%',
-        transform: 'translateX(-50%)',
-      }}>
+      <div className="datatable-page-indicator">
         page {currentPage + 1} of {totalPages}
       </div>
-      <div className="flex justify-center mt-4" style={{ position: 'relative', left: '50%', bottom: '0', marginTop: '0.5rem'}}>
+      <div className="datatable-pagination">
         <button
           onClick={handlePreviousPage}
           disabled={currentPage === 0}
-          className="px-2 py-1 border rounded shadow-md bg-white"
-          style={{ color: currentPage === 0 ? 'gray' : 'black', backgroundColor: 'white', padding: '0.3rem 0.5rem' }}
+          className="datatable-pagination-btn px-2 py-1 border rounded shadow-md bg-white"
         >
           &lt;
         </button>
         <button
           onClick={handleNextPage}
           disabled={(currentPage + 1) * tasksPerPage >= data.length}
-          className="px-2 py-1 border rounded shadow-md bg-white"
-          style={{ color: (currentPage + 1) * tasksPerPage >= data.length ? 'gray' : 'black', backgroundColor: 'white', padding: '0.3rem 0.5rem' }}
+          className="datatable-pagination-btn px-2 py-1 border rounded shadow-md bg-white"
         >
           &gt;
         </button>

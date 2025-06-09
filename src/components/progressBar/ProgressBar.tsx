@@ -1,4 +1,5 @@
 import React from 'react';
+import './ProgressBar.scss';
 
 type ProgressBarProps = {
   startDate: string;
@@ -7,29 +8,10 @@ type ProgressBarProps = {
 };
 
 const ProgressBar: React.FC<ProgressBarProps> = ({ startDate, dueDate, status }) => {
-  // אם אין תאריכים, נציג פס ריק
   if (!startDate || !dueDate) {
     return (
-      <div
-        style={{ 
-          position: 'relative',
-          minWidth: '70px',
-          height: '13px',
-          backgroundColor: '#e5e7eb',
-          borderRadius: '5px',
-          overflow: 'hidden',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center'
-        }}
-      >
-        <div
-          style={{
-            color: '#6b7280',
-            fontSize: '11px',
-            fontWeight: '500'
-          }}
-        >
+      <div className="progressbar-container">
+        <div className="progressbar-set-dates">
           Set dates
         </div>
       </div>
@@ -61,42 +43,15 @@ const ProgressBar: React.FC<ProgressBarProps> = ({ startDate, dueDate, status })
   };
 
   return (
-    <div
-      style={{ 
-        position: 'relative',
-        minWidth: '70px',
-        height: '13px',
-        backgroundColor: '#e5e7eb',
-        borderRadius: '5px',
-        overflow: 'hidden'
-      }}
-    >
+    <div className="progressbar-container">
       <div
+        className="progressbar-bar"
         style={{
           width: `${percentage}%`,
           backgroundColor: getBarColor(),
-          height: '100%',
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          transition: 'width 0.5s ease-in-out',
-          borderRadius: '4px'
         }}
       />
-      <div
-        style={{
-          position: 'absolute',
-          width: '100%',
-          height: '100%',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          color: '#000000',
-          fontSize: '11px',
-          fontWeight: '500',
-          zIndex: 1
-        }}
-      >
+      <div className="progressbar-label">
         {Math.round(percentage)}%
       </div>
     </div>
