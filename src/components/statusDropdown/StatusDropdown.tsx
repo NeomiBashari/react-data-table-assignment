@@ -10,6 +10,11 @@ interface StatusDropdownProps {
 const StatusDropdown: React.FC<StatusDropdownProps> = ({ statusColors, onSelect, style }) => {
   const statuses = Object.keys(statusColors);
 
+  const handleClick = (event: React.MouseEvent<HTMLDivElement>) => {
+    onSelect(event.currentTarget.textContent as string);
+  };
+
+
   return (
     <div 
       className="status-dropdown"
@@ -18,7 +23,7 @@ const StatusDropdown: React.FC<StatusDropdownProps> = ({ statusColors, onSelect,
       {statuses.map((status) => (
         <div
           key={status}
-          onClick={() => onSelect(status)}
+          onClick={handleClick}
           className="status-dropdown-option"
         >
           <span

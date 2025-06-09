@@ -46,24 +46,6 @@ const DataTable: React.FC<DataTableProps> = ({ data, onDataChange }) => {
 
   const statusCellRefs = useRef<(HTMLDivElement | null)[]>([]);
 
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        editingStatusIndex !== null &&
-        statusCellRefs.current[editingStatusIndex] &&
-        !statusCellRefs.current[editingStatusIndex]?.contains(event.target as Node)
-      ) {
-        setEditingStatusIndex(null);
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, [editingStatusIndex]);
-
   const handleNextPage = () => {
     if ((currentPage + 1) * tasksPerPage < data.length) {
       setCurrentPage(currentPage + 1);
@@ -107,6 +89,9 @@ const DataTable: React.FC<DataTableProps> = ({ data, onDataChange }) => {
   }, [paginatedData, sortConfig]);
 
   const handleInputChange = (rowIndex: number, key: string, value: any) => {
+
+
+    console.log(`Updating row ${rowIndex}, key: ${key}, value: ${value}`);
     const actualIndex = typeof rowIndex === 'number' ? 
       (currentPage * tasksPerPage + rowIndex) : rowIndex;
     const updatedData = [...data];
@@ -115,12 +100,13 @@ const DataTable: React.FC<DataTableProps> = ({ data, onDataChange }) => {
   };
 
   const handleStatusClick = (rowIndex: number, event: React.MouseEvent) => {
-    const actualIndex = currentPage * tasksPerPage + rowIndex;
+    // console.log(`Status cell clicked at row index: ${rowIndex}`);
+     const actualIndex = currentPage * tasksPerPage + rowIndex;
     if (editingStatusIndex === actualIndex) {
       setEditingStatusIndex(null);
       return;
     }
-    setEditingStatusIndex(actualIndex);
+     setEditingStatusIndex(actualIndex);
     const rect = (event.target as HTMLElement).getBoundingClientRect();
     setDropdownPosition({
       top: rect.top + window.scrollY - 420,
