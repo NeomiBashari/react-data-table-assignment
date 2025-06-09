@@ -11,8 +11,11 @@ interface ColumnFilterProps {
 const ColumnFilter: React.FC<ColumnFilterProps> = ({ headers, visibleColumns, onToggleColumn }) => {
   const [isOpen, setIsOpen] = useState(false);
 
-  const handleToggle = (key: string) => {
-    onToggleColumn(key);
+  const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const key = e.currentTarget.dataset.key;
+    if (key) {
+      onToggleColumn(key);
+    }
   };
 
   return (
@@ -32,7 +35,8 @@ const ColumnFilter: React.FC<ColumnFilterProps> = ({ headers, visibleColumns, on
                 <input
                   type="checkbox"
                   checked={visibleColumns.has(header.key)}
-                  onChange={() => handleToggle(header.key)}
+                  data-key={header.key}
+                  onChange={handleCheckboxChange}
                 />
                 {header.label}
               </label>
