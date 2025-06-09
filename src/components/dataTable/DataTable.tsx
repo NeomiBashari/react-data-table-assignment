@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { calculateProgressPercentage } from '../..//utils/calculateProgress';
 import 'react-datepicker/dist/react-datepicker.css';
 import './DataTable.scss';
 import type { TableData } from '../../types/table.types';
@@ -33,12 +34,14 @@ const DataTable: React.FC<DataTableProps> = ({ data, onDataChange }) => {
 
   const [selectedRowIndex, setSelectedRowIndex] = useState<number | null>(null);
 
+  const [sortConfig, setSortConfig] = useState<{ key: string; direction: 'asc' | 'desc' } | null>(null);
+
   const statusColors: { [key: string]: string } = {
-    "Todo": "#7da6ff",         // darker pastel blue
-    "In progress": "#ff8fb2", // darker pastel pink
-    "On hold": "#ffd580",     // darker pastel orange
-    "Canceled": "#ff7a7a",    // darker pastel red
-    "Done": "#7be87b",        // darker pastel green
+    "Todo": "#7da6ff",      
+    "In progress": "#ff8fb2",
+    "On hold": "#ffd580",    
+    "Canceled": "#ff7a7a",    
+    "Done": "#7be87b",       
   };
 
   const statusCellRefs = useRef<(HTMLDivElement | null)[]>([]);
@@ -78,6 +81,31 @@ const DataTable: React.FC<DataTableProps> = ({ data, onDataChange }) => {
     (currentPage + 1) * tasksPerPage
   );
 
+  const sortedData = React.useMemo(() => {
+    if (!sortConfig) return paginatedData;
+
+    const sorted = [...paginatedData].sort((a, b) => {
+      const aValue = sortConfig.key === 'timeline' ? calculateProgressPercentage(a.startDate, a.dueDate, a.status) : a[sortConfig.key];
+      const bValue = sortConfig.key === 'timeline' ? calculateProgressPercentage(b.startDate, b.dueDate, b.status) : b[sortConfig.key];
+
+      if (typeof aValue === 'string' && typeof bValue === 'string') {
+        return sortConfig.direction === 'asc'
+          ? aValue.localeCompare(bValue)
+          : bValue.localeCompare(aValue);
+      } else if (typeof aValue === 'number' && typeof bValue === 'number') {
+        return sortConfig.direction === 'asc' ? aValue - bValue : bValue - aValue;
+      } else if (typeof aValue === 'boolean' && typeof bValue === 'boolean') {
+        return sortConfig.direction === 'asc'
+          ? (aValue === bValue ? 0 : aValue ? -1 : 1)
+          : (aValue === bValue ? 0 : aValue ? 1 : -1);
+      } else {
+        return 0;
+      }
+    });
+
+    return sorted;
+  }, [paginatedData, sortConfig]);
+
   const handleInputChange = (rowIndex: number, key: string, value: any) => {
     const actualIndex = typeof rowIndex === 'number' ? 
       (currentPage * tasksPerPage + rowIndex) : rowIndex;
@@ -114,6 +142,18 @@ const DataTable: React.FC<DataTableProps> = ({ data, onDataChange }) => {
     }
   };
 
+  const handleSort = (key: string) => {
+    setSortConfig((prevConfig) => {
+      if (prevConfig?.key === key) {
+        return {
+          key,
+          direction: prevConfig.direction === 'asc' ? 'desc' : 'asc',
+        };
+      }
+      return { key, direction: 'asc' };
+    });
+  };
+
   return (
     <div className="datatable-container overflow-x-auto rounded-lg shadow-md relative">
       {/* Delete Button */}
@@ -130,7 +170,8 @@ const DataTable: React.FC<DataTableProps> = ({ data, onDataChange }) => {
             {headers.map((header, index) => (
               <th
                 key={index}
-                className="datatable-th px-4 py-2 text-left font-semibold text-gray-700"
+                className="datatable-th px-4 py-2 text-left font-semibold text-gray-700 cursor-pointer"
+                onClick={() => handleSort(header.key)}
               >
                 {header.label}
               </th>
@@ -138,7 +179,7 @@ const DataTable: React.FC<DataTableProps> = ({ data, onDataChange }) => {
           </tr>
         </thead>
         <tbody>
-          {paginatedData.map((row, rowIndex) => (
+          {sortedData.map((row, rowIndex) => (
             <TaskTableRow
               key={rowIndex}
               row={row}
