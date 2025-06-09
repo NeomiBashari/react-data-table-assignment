@@ -1,6 +1,6 @@
 .datatable-container {
   position: relative;
-  top: 17rem;
+    top: 17rem;
   left: -20rem;
   min-height: calc(100vh - 300px);
   background-color: transparent;
@@ -32,7 +32,7 @@
   font-size: 14px;
   margin-top: 0.5rem;
   position: relative;
-  left: 65%;
+  left: 60%;
   transform: translateX(-50%);
 }
 .datatable-pagination {
@@ -40,7 +40,7 @@
   justify-content: center;
   margin-top: 0.5rem;
   position: relative;
-  left: 15%;
+  left: 10%;
   bottom: 0;
 }
 .datatable-pagination-btn {
@@ -57,4 +57,9 @@
 .datatable-pagination-btn:disabled {
   color: gray;
   cursor: not-allowed;
+}
+.datatable-controls {
+  display: flex;
+  margin-bottom: 0.5rem;
+  margin-left: 76.5rem; 
 }

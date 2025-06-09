@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useRef } from 'react';
 import { calculateProgressPercentage } from '../..//utils/calculateProgress';
 import 'react-datepicker/dist/react-datepicker.css';
 import './DataTable.scss';
@@ -6,6 +6,7 @@ import type { TableData } from '../../types/table.types';
 import StatusDropdown from '../statusDropdown/StatusDropdown';
 import DeleteButton from '../deleteButton/DeleteButton';
 import TaskTableRow from '../tableRow/TableRow';
+import ColumnFilter from '../columnFilter/ColumnFilter';
 
 type DataTableProps = {
   data: TableData;
@@ -35,6 +36,8 @@ const DataTable: React.FC<DataTableProps> = ({ data, onDataChange }) => {
   const [selectedRowIndex, setSelectedRowIndex] = useState<number | null>(null);
 
   const [sortConfig, setSortConfig] = useState<{ key: string; direction: 'asc' | 'desc' } | null>(null);
+
+  const [visibleColumns, setVisibleColumns] = useState<Set<string>>(new Set(headers.map((header) => header.key)));
 
   const statusColors: { [key: string]: string } = {
     "Todo": "#7da6ff",      
@@ -100,7 +103,6 @@ const DataTable: React.FC<DataTableProps> = ({ data, onDataChange }) => {
   };
 
   const handleStatusClick = (rowIndex: number, event: React.MouseEvent) => {
-    // console.log(`Status cell clicked at row index: ${rowIndex}`);
      const actualIndex = currentPage * tasksPerPage + rowIndex;
     if (editingStatusIndex === actualIndex) {
       setEditingStatusIndex(null);
@@ -140,10 +142,26 @@ const DataTable: React.FC<DataTableProps> = ({ data, onDataChange }) => {
     });
   };
 
+  const handleToggleColumn = (key: string) => {
+    setVisibleColumns((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(key)) {
+        newSet.delete(key);
+      } else {
+        newSet.add(key);
+      }
+      return newSet;
+    });
+  };
+
   return (
     <div className="datatable-container overflow-x-auto rounded-lg shadow-md relative">
-      {/* Delete Button */}
-      <div className="datatable-delete-button">
+      <div className="datatable-controls">
+        <ColumnFilter
+          headers={headers}
+          visibleColumns={visibleColumns}
+          onToggleColumn={handleToggleColumn}
+        />
         <DeleteButton
           isDisabled={selectedRowIndex === null}
           onDelete={handleConfirmDelete}
@@ -154,13 +172,15 @@ const DataTable: React.FC<DataTableProps> = ({ data, onDataChange }) => {
         <thead className="datatable-thead bg-gray-200">
           <tr>
             {headers.map((header, index) => (
-              <th
-                key={index}
-                className="datatable-th px-4 py-2 text-left font-semibold text-gray-700 cursor-pointer"
-                onClick={() => handleSort(header.key)}
-              >
-                {header.label}
-              </th>
+              visibleColumns.has(header.key) && (
+                <th
+                  key={index}
+                  className="datatable-th px-4 py-2 text-left font-semibold text-gray-700 cursor-pointer"
+                  onClick={() => handleSort(header.key)}
+                >
+                  {header.label}
+                </th>
+              )
             ))}
           </tr>
         </thead>
@@ -170,7 +190,7 @@ const DataTable: React.FC<DataTableProps> = ({ data, onDataChange }) => {
               key={rowIndex}
               row={row}
               rowIndex={rowIndex}
-              headers={headers}
+              headers={headers.filter((header) => visibleColumns.has(header.key))}
               isSelected={rowIndex === selectedRowIndex}
               statusColors={statusColors}
               onSelect={() => handleRowClick(rowIndex)}
